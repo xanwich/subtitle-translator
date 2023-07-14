@@ -1,0 +1,5 @@
+numpy==1.25.0
+opencv==4.6.0
+Pillow==9.4.0
+pytesseract==0.3.10
+translate==3.6.1
