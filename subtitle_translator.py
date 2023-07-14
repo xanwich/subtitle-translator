@@ -19,12 +19,14 @@ languages = {
 
 
 class App:
-    def __init__(self, from_lang, to_lang="en", x=400, y=100, y_offset=38):
+    def __init__(self, from_lang, to_lang="en", wait_time=3, x=400, y=100, y_offset=38):
         """Creates translator app
 
         :param from_lang: Two-letter language code of origin language
         :param to_lang: Two-letter language code of desired result language,
             defaults to "en"
+        :param wait_time: Time in seconds to wait between screen captures,
+            defaults to 3.
         :param x: Width in pixels of init window
         :param y: Height in pixels of init window
         :param y_offset: Currently unused. Height in pixels of menu bar
@@ -33,6 +35,7 @@ class App:
         self.x, self.y, self.y_offset = x, y, y_offset
         self.to_lang = to_lang
         self.from_lang = from_lang
+        self.wait_time = wait_time
 
         self.translator = Translator(to_lang=self.to_lang, from_lang=self.from_lang)
 
@@ -133,17 +136,13 @@ class App:
         if self.label:
             self.label.destroy()
 
-    def loop(self, wait_time=3):
-        """Main loop: capture image, OCR and translate text, show new subtitles
-
-        :param wait_time: Time in seconds to wait between screen captures,
-            defaults to 3.
-        """
+    def loop(self):
+        """Main loop: capture image, OCR and translate text, show new subtitles"""
         while True:
             image = self.get_image()
             text = self.get_text(image)
             self.show_text(text)
-            sleep(wait_time)
+            sleep(self.wait_time)
             self.hide_text()
 
     def run(self):
@@ -153,7 +152,7 @@ class App:
 if __name__ == "__main__":
     # TODO: add this selection to tk ui
     parser = argparse.ArgumentParser(
-        prog="Subtitle Translator",
+        prog="python subtitle_translator.py",
         description="Live translation with screen capture and OCR",
     )
     parser.add_argument(
@@ -170,7 +169,14 @@ if __name__ == "__main__":
         help="Two-letter language code of desired result languagen (default 'en')",
         choices=languages.keys(),
     )
+    parser.add_argument(
+        "-w",
+        "--wait-time",
+        default=3,
+        type=int,
+        help="Time in seconds to wait between screen captures (default 3)",
+    )
     args = parser.parse_args()
 
-    app = App(args.from_lang, args.to_lang)
+    app = App(args.from_lang, args.to_lang, wait_time=args.wait_time)
     app.run()
